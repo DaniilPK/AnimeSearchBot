@@ -4,6 +4,7 @@ from config import client
 
 
 async def search(message: types.Message, bot: Bot):
+    await bot.send_chat_action(message.chat.id, action='typing')
     if message.photo or message.sticker:
         if message.sticker:
             res = await bot.get_file(message.sticker.file_id)
@@ -16,18 +17,27 @@ async def search(message: types.Message, bot: Bot):
 
         try:
             for result in sauce.results:
-                print(result.index, result.similarity, result.data)
+                print(result.index, result.index.id, result.similarity, result.data)
                 if result.index.id == 21:
                     if result.data.urls:
                         await message.answer_photo(result.data.urls[-1],
                                                    caption=f'{result.index} <b>{result.data.title}</b>\n'
                                                            f'Similarity: {result.similarity}%\n'
                                                            f'Episode:{result.data.episode} Timestamp: {result.data.timestamp}')
+                        break
+                elif result.index.id == 22:
+                    if result.data.urls:
+                        await message.answer(f'{result.index} <b>{result.data.title}</b>\n'
+                                             f'Similarity: {result.similarity}%\n'
+                                             f'Episode:{result.data.episode} Timestamp: {result.data.timestamp}')
+                        break
+
         except Exception as ex:
             logging.error(ex)
 
 
 async def searchInGroup(message: types.Message, bot: Bot):
+    await bot.send_chat_action(message.chat.id,action='typing')
     if message.reply_to_message:
         if message.reply_to_message.photo or message.reply_to_message.sticker:
             if message.reply_to_message.photo or message.reply_to_message.sticker:
@@ -48,6 +58,14 @@ async def searchInGroup(message: types.Message, bot: Bot):
                                                           caption=f'{result.index} <b>{result.data.title}</b>\n'
                                                                   f'Similarity: {result.similarity}%\n'
                                                                   f'Episode:{result.data.episode} Timestamp: {result.data.timestamp}')
+                            break
+                        elif result.index.id == 22:
+                            if result.data.urls:
+                                await message.answer(f'{result.index} <b>{result.data.title}</b>\n'
+                                                     f'Similarity: {result.similarity}%\n'
+                                                     f'Episode:{result.data.episode} Timestamp: {result.data.timestamp}')
+                                break
+
                 except Exception as ex:
                     logging.error(ex)
         else:
